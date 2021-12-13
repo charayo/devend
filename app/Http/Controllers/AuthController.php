@@ -37,4 +37,24 @@ class AuthController extends Controller
             'message'=>'Logged out'
         ];
     }
+
+    public function login(Request $request){
+        $fields = $request->validate([
+            'name'=>'required|string',
+            'password'=>'required|string',
+        ]);
+        $user = User::where('email', $fields['email'])->first();
+        if(!$user || !Hash::check($fields['password'], $user->password)){
+            return response([
+                'message'=>'bad response'
+            ]);
+        }
+        $token = $user->createToken('myapptoken')->plainTextToken;
+
+        $response = [
+            'user' => $user,
+            'token' => $token
+        ];
+        return response($response, 200);
+    }
 }
